@@ -9,7 +9,7 @@ spring:
     # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smart-picture
+    url: jdbc:mysql://localhost:3306/smart_picture
     username: root
     password: 1234
 mybatis-plus:
@@ -35,3 +35,11 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.wjh.smartpicturebackend.controller
+##腾讯COS对象存储配置
+#cos:
+#  client:
+#    host:
+#    secretId:
+#    secretKey:
+#    region:
+#    bucket:

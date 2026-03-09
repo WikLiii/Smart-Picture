@@ -1,3 +1,6 @@
+### Custom ###
+application-local.yml
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -11,7 +14,7 @@ target/
 .project
 .settings
 .springBeans
-.sts4-cache
+.sts4-cachek
 
 ### IntelliJ IDEA ###
 .idea
@@ -31,3 +34,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
