@@ -53,6 +53,13 @@ public interface UserService extends IService<User> {
     User getLoginUser(HttpServletRequest request);
 
     /**
+     * 判断用户是否为管理员
+     * @param user 当前用户
+     * @return
+     */
+    boolean isAdmin(User user);
+
+    /**
      * 获取加密后的密码
      *
      * @param userPasswprd

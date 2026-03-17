@@ -169,6 +169,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     /**
+     * 判断用户是否为管理员
+     * @param user 当前用户
+     * @return
+     */
+    @Override
+    public boolean isAdmin(User user) {
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
+    }
+
+    /**
      * 获取加密的密码
      *
      * @param userPasswprd 用户密码
