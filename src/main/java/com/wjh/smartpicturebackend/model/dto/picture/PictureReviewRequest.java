@@ -5,30 +5,25 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 图片上传请求
+ * 图片审核请求
  */
 @Data
-public class PictureUploadRequest implements Serializable {
+public class PictureReviewRequest implements Serializable {
     /**
      * id
      */
 
     private Long id;
     /**
-     * 文件地址
+     * 审核状态：0-待审核; 1-通过; 2-拒绝
      */
 
-
-    private String fileUrl;
-
+    private Integer reviewStatus;
     /**
-     * 图片名称
+     * 审核信息
      */
-
-    private String picName;
-
+    private String reviewMessage;
 
 
     private static final long serialVersionUID = 1L;
-
 }

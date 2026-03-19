@@ -26,9 +26,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-
+/**
+ * 已被优化（upload包）
+ */
 @Service
 @Slf4j
+@Deprecated
 public class FileManager {
 
     @Resource

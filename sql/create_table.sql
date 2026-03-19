@@ -76,3 +76,19 @@ create table if not exists picture
 # 3）索引设计：为高频查询的字段（如图片名称、简介、分类、标签、用户 id）添加索引，提高查询效率。
 #
 # 4）逻辑删除：也就是 “软删除”，使用 isDelete 字段标记是否删除，避免直接删除数据导致数据不可恢复问题
+ALTER TABLE picture
+
+    ADD COLUMN reviewStatus  INT DEFAULT 0 NOT NULL COMMENT '审核状态：0-待审核; 1-通过; 2-拒绝',
+    ADD COLUMN reviewMessage VARCHAR(512)  NULL COMMENT '审核信息',
+    ADD COLUMN reviewerId    BIGINT        NULL COMMENT '审核人 ID',
+    ADD COLUMN reviewTime    DATETIME      NULL COMMENT '审核时间';
+
+#创建基于 reviewStatus 列的索引
+CREATE INDEX idx_reviewStatus ON picture (reviewStatus);
+# 注意事项：
+#
+# 1）审核状态：reviewStatus 使用整数（0、1、2）表示不同的审核状态，而不是用字符串，可以节约表的空间、提升查找效率。
+#
+# 2）索引设计：由于要根据审核状态筛选图片，所以给该字段添加索引，提升查询性能。
+
+
