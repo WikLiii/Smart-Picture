@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wjh.smartpicturebackend.exception.BusinessException;
 import com.wjh.smartpicturebackend.exception.ErrorCode;
 import com.wjh.smartpicturebackend.exception.ThrowUtils;
+import com.wjh.smartpicturebackend.manager.CosManager;
 import com.wjh.smartpicturebackend.manager.FileManager;
 import com.wjh.smartpicturebackend.manager.upload.FilePictureUpload;
 import com.wjh.smartpicturebackend.manager.upload.PictureUploadTemplate;
@@ -32,6 +33,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,6 +62,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     private UserService userService;
     @Resource
     private FilePictureUpload filePictureUpload;
+
+    @Autowired
+    private CosManager cosManager;
 
     @Resource
     private UrlPictureUpload urlPictureUpload;
@@ -114,6 +120,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //构造入库文件信息
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
+        picture.setThumbnailUrl(uploadPictureResult.getThumbnailUrl());
         //支持外层传递名称
         String picName = uploadPictureResult.getPicName();
         if (pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())) {
@@ -126,6 +133,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         picture.setPicScale(uploadPictureResult.getPicScale());
         picture.setPicFormat(uploadPictureResult.getPicFormat());
         picture.setUserId(loginUser.getId());
+
 
         //补充审核参数
         this.fillReviewParams(picture, loginUser);
@@ -415,6 +423,32 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         }
 
         return uploadCount;
+    }
+
+    /**
+     * 数据清理
+     * @param oldPicture
+     */
+    @Async
+    @Override
+    public void clearPictureFile(Picture oldPicture) {
+
+        String pictureUrl = oldPicture.getUrl();
+        long count = this.lambdaQuery()
+                .eq(Picture::getUrl, pictureUrl)
+                .count();
+
+        if (count > 1) {
+            return;
+        }
+
+
+        cosManager.deleteObject(oldPicture.getUrl());
+
+        String thumbnailUrl = oldPicture.getThumbnailUrl();
+        if (StrUtil.isNotBlank(thumbnailUrl)) {
+            cosManager.deleteObject(thumbnailUrl);
+        }
     }
 
 
