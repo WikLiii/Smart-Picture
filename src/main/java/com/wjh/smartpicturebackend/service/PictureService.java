@@ -2,10 +2,9 @@ package com.wjh.smartpicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.wjh.smartpicturebackend.model.dto.picture.PictureQueryRequest;
-import com.wjh.smartpicturebackend.model.dto.picture.PictureReviewRequest;
-import com.wjh.smartpicturebackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.wjh.smartpicturebackend.model.dto.picture.PictureUploadRequest;
+import com.wjh.smartpicturebackend.exception.BusinessException;
+import com.wjh.smartpicturebackend.exception.ErrorCode;
+import com.wjh.smartpicturebackend.model.dto.picture.*;
 import com.wjh.smartpicturebackend.model.dto.user.UserQueryRequest;
 import com.wjh.smartpicturebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -101,4 +100,28 @@ public interface PictureService extends IService<Picture> {
      * @param oldPicture
      */
     void clearPictureFile(Picture oldPicture);
+
+
+    /**
+     * 校验空间图片的权限
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture) ;
+
+    /**
+     * 删除图片
+     * @param pictureId
+     * @param loginUser
+     */
+
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 编辑图片
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 }
