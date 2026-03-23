@@ -127,4 +127,6 @@ ALTER TABLE picture
 CREATE INDEX idx_spaceId ON picture (spaceId);
 #给图片表添加新列
 # 默认情况下，spaceId 为空，表示图片上传到了公共图库。
-
+ALTER TABLE picture
+    ADD COLUMN picColor varchar(16) null comment '图片主色调';
+# 补充颜色字段

@@ -124,6 +124,10 @@ public class Picture implements Serializable {
      * 审核时间
      */
     private Date reviewTime;
+    /**
+     * 主颜色
+     */
+    private String picColor;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

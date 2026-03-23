@@ -3,7 +3,7 @@ package com.wjh.smartpicturebackend.model.dto.file;
 import lombok.Data;
 
 /**
- * 上传图片的结果
+ * 上传图片的解析结果
  */
 @Data
 public class UploadPictureResult {
@@ -32,5 +32,9 @@ public class UploadPictureResult {
 
 
     private String picFormat;
+    /**
+     * 主颜色
+     */
+    private String picColor;
 
 }

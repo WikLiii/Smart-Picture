@@ -159,7 +159,7 @@ public class SpaceController {
      * @return
      */
     @PostMapping("/list/page/vo")
-    public BaseResponse<Page<SpaceVO>> listspaceVOByPage(@RequestBody SpaceQueryRequest spaceQueryRequest,
+    public BaseResponse<Page<SpaceVO>> listSpaceVOByPage(@RequestBody SpaceQueryRequest spaceQueryRequest,
                                                              HttpServletRequest request) {
         long current = spaceQueryRequest.getCurrent();
         long size = spaceQueryRequest.getPageSize();
@@ -180,7 +180,7 @@ public class SpaceController {
      * @return
      */
     @PostMapping("/edit")
-    public BaseResponse<Boolean> editspace(@RequestBody SpaceEditRequest spaceEditRequest
+    public BaseResponse<Boolean> editSpace(@RequestBody SpaceEditRequest spaceEditRequest
             ,HttpServletRequest request){
 
         if(spaceEditRequest == null || spaceEditRequest.getId() <= 0){

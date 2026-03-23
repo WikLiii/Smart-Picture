@@ -85,7 +85,7 @@ public  abstract class PictureUploadTemplate {
                 }
 
                 //封装压缩图的返回结果
-                return buildResult(originalFilename, compressedCiObject, thumbnailCiObject);
+                return buildResult(originalFilename, compressedCiObject, thumbnailCiObject,imageInfo);
 
 
 
@@ -108,9 +108,10 @@ public  abstract class PictureUploadTemplate {
      * @param originalFilename 原始文件名
      * @param compressCiObject 压缩后的图片
      * @param thumbnailCiObject 缩略后的图片
+     * @param imageInfo 图片信息
      * @return
      */
-    private UploadPictureResult buildResult(String originalFilename, CIObject compressCiObject,CIObject thumbnailCiObject) {
+    private UploadPictureResult buildResult(String originalFilename, CIObject compressCiObject,CIObject thumbnailCiObject,ImageInfo imageInfo) {
         //计算宽高比
         int picWidth = compressCiObject.getWidth();
         int picHeight = compressCiObject.getHeight();
@@ -126,6 +127,9 @@ public  abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(compressCiObject.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
+
+
 
         //返回可访问的地址
         return uploadPictureResult;
@@ -157,6 +161,7 @@ public  abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
 
         //返回可访问的地址
         return uploadPictureResult;

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.wjh.smartpicturebackend.model.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author lenovo
@@ -124,4 +125,16 @@ public interface PictureService extends IService<Picture> {
      */
 
     void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 以颜色搜图
+     * @param spaceId
+     * @param picColor
+     * @param loginUser
+     * @return
+     */
+
+    List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 }

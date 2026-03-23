@@ -1,14 +1,14 @@
 package com.wjh.smartpicturebackend.controller;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.COSObjectInputStream;
-import com.qcloud.cos.utils.IOUtils;
 import com.wjh.smartpicturebackend.annotation.AuthCheck;
+import com.wjh.smartpicturebackend.api.imagesearch.SogouImageSearchApiFacade;
+import com.wjh.smartpicturebackend.api.imagesearch.model.ImageSearchResult;
 import com.wjh.smartpicturebackend.common.BaseResponse;
 import com.wjh.smartpicturebackend.common.DeleteRequest;
 import com.wjh.smartpicturebackend.common.ResultUtils;
@@ -16,7 +16,6 @@ import com.wjh.smartpicturebackend.constant.UserConstant;
 import com.wjh.smartpicturebackend.exception.BusinessException;
 import com.wjh.smartpicturebackend.exception.ErrorCode;
 import com.wjh.smartpicturebackend.exception.ThrowUtils;
-import com.wjh.smartpicturebackend.manager.CosManager;
 import com.wjh.smartpicturebackend.model.dto.picture.*;
 import com.wjh.smartpicturebackend.model.entity.Picture;
 import com.wjh.smartpicturebackend.model.entity.Space;
@@ -28,8 +27,6 @@ import com.wjh.smartpicturebackend.service.PictureService;
 import com.wjh.smartpicturebackend.service.SpaceService;
 import com.wjh.smartpicturebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Request;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -39,10 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -379,6 +373,88 @@ public class PictureController {
         int uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(uploadCount);
     }
+
+//    /**
+//     * 以图搜图（目前问题较大）
+//     * @param searchPictureByPictureRequest
+//     * @return
+//     */
+//    @PostMapping("/search/picture")
+//    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(@RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
+//        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+//        Long pictureId = searchPictureByPictureRequest.getPictureId();
+//        ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR);
+//        Picture oldPicture = pictureService.getById(pictureId);
+//        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+//        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(oldPicture.getUrl());
+//        return ResultUtils.success(resultList);
+//    }
+    /**
+     * 根据数据库中的图片 ID 进行以图搜图
+     * @param searchPictureByPictureRequest 包含 pictureId 的请求对象
+     * @return 搜索结果列表
+     */
+    @PostMapping("/search/picture")
+    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(
+            @RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
+
+        // 1. 基础参数校验
+        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+        Long pictureId = searchPictureByPictureRequest.getPictureId();
+        ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR, "图片 ID 非法");
+
+        // 2. 校验图片是否存在于数据库
+        Picture oldPicture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR, "图片不存在");
+
+        // 3. 获取图片 URL 并执行搜索
+        String imageUrl = oldPicture.getUrl();
+        ThrowUtils.throwIf(StrUtil.isBlank(imageUrl), ErrorCode.OPERATION_ERROR, "图片地址为空");
+
+        try {
+            // 调用重构后的搜狗识图 Facade 接口
+            // 如果你想切回百度识图，将这里改成 ImageSearchApiFacade.searchImage(imageUrl) 即可
+            List<ImageSearchResult> resultList = SogouImageSearchApiFacade.searchImage(imageUrl);
+
+            // 4. 返回标准成功的响应包装
+            return ResultUtils.success(resultList);
+        } catch (Exception e) {
+            // 打印错误日志并抛出业务异常，由全局异常处理器拦截
+            log.error("以图搜图失败, pictureId: {}", pictureId, e);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "搜图引擎调用失败");
+        }
+    }
+
+    /**
+     * 以颜色搜图
+     * @param searchPictureByColorRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/search/color")
+    public BaseResponse<List<PictureVO>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(searchPictureByColorRequest == null, ErrorCode.PARAMS_ERROR);
+        String picColor = searchPictureByColorRequest.getPicColor();
+        Long spaceId = searchPictureByColorRequest.getSpaceId();
+        User loginUser = userService.getLoginUser(request);
+        List<PictureVO> result = pictureService.searchPictureByColor(spaceId, picColor, loginUser);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 批量编辑图片
+     * @param pictureEditByBatchRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/edit/batch")
+    public BaseResponse<Boolean> editPictureByBatch(@RequestBody PictureEditByBatchRequest pictureEditByBatchRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureEditByBatchRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.editPictureByBatch(pictureEditByBatchRequest, loginUser);
+        return ResultUtils.success(true);
+    }
+
 
 
 
