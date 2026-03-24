@@ -2,6 +2,7 @@ package com.wjh.smartpicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wjh.smartpicturebackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
 import com.wjh.smartpicturebackend.exception.BusinessException;
 import com.wjh.smartpicturebackend.exception.ErrorCode;
 import com.wjh.smartpicturebackend.model.dto.picture.*;
@@ -135,6 +136,19 @@ public interface PictureService extends IService<Picture> {
      */
 
     List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+    /**
+     * 批量管理图片
+     * @param pictureEditByBatchRequest
+     * @param loginUser
+     */
 
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    /**
+     * 创建扩图任务
+     *
+     * @param createPictureOutPaintingTaskRequest
+     * @param loginUser
+     */
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }

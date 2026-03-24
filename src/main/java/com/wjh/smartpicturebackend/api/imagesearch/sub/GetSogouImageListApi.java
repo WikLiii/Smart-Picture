@@ -78,7 +78,7 @@ public class GetSogouImageListApi {
             }
 
             // 只取前10个
-            if (list.size() >= 10) break;
+            if (list.size() >= 24) break;
         }
         return list;
     }
