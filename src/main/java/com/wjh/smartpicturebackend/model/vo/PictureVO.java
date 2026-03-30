@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.wjh.smartpicturebackend.model.entity.Picture;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.beans.BeanUtils;
@@ -72,6 +73,11 @@ public class PictureVO implements Serializable {
      * 主颜色
      */
     private String picColor;
+
+    /**
+     * 权限列表
+     */
+    private List<String> permissionList = new ArrayList<>();
 
     private static final long serialVersionUID = 1L;
 

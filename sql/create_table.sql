@@ -154,4 +154,3 @@ create table if not exists space_user
 # 1. 给 spaceId 和 userId 添加唯一索引，确保同一用户在同一空间中只能有一个角色（不能重复加入）。由于有唯一键，不需要使用逻辑删除字段，否则无法退出后再重新加入。
 # 2. 给关联字段添加索引，提高查询效率
 # 3. 为了跟用户自身在项目中的角色 userRole 区分开，空间角色的名称使用 spaceRole
-

@@ -11,6 +11,7 @@ import com.wjh.smartpicturebackend.constant.UserConstant;
 import com.wjh.smartpicturebackend.exception.BusinessException;
 import com.wjh.smartpicturebackend.exception.ErrorCode;
 import com.wjh.smartpicturebackend.exception.ThrowUtils;
+import com.wjh.smartpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.wjh.smartpicturebackend.model.dto.space.*;
 import com.wjh.smartpicturebackend.model.entity.Space;
 import com.wjh.smartpicturebackend.model.entity.User;
@@ -37,6 +38,8 @@ public class SpaceController {
     private UserService userService;
     @Resource
     private SpaceService spaceService;
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
 
     /**
@@ -132,7 +135,11 @@ public class SpaceController {
 
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null,ErrorCode.NOT_FOUND_ERROR);
-        return ResultUtils.success(spaceService.getSpaceVO(space,request));
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
+        return ResultUtils.success(spaceVO);
     }
 
     /**
